@@ -6,7 +6,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { BUSINESS } from "@/lib/site-data";
 import { PATH } from "@/lib/paths";
 import { NAV_GROUPS } from "@/components/site/nav-config";
-import { BowlingSoundToggle } from "@/components/site/BowlingSoundToggle";
 
 function cx(...p: (string | false | undefined)[]) {
   return p.filter(Boolean).join(" ");
@@ -143,7 +142,6 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <BowlingSoundToggle />
           <div className="hidden items-center gap-2 lg:flex">
           <a
             href={BUSINESS.phoneTel}
