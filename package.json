@@ -3,7 +3,7 @@
   "private": true,
   "workspaces": ["site"],
   "scripts": {
-    "build": "npm run build -w site",
+    "build": "npm run build -w site && node ./scripts/sync-next-output.mjs",
     "dev": "npm run dev -w site",
     "start": "npm run start -w site",
     "lint": "npm run lint -w site"
