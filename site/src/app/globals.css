@@ -209,3 +209,8 @@ select:focus-visible {
   outline: 2px solid rgba(34, 211, 238, 0.85);
   outline-offset: 2px;
 }
+
+/* lane map + date strip: thin neon scrollbar */
+.lane-scroll { scrollbar-width: thin; scrollbar-color: rgba(34, 211, 238, 0.5) transparent; }
+.lane-scroll::-webkit-scrollbar { height: 6px; }
+.lane-scroll::-webkit-scrollbar-thumb { background: rgba(34, 211, 238, 0.5); border-radius: 999px; }

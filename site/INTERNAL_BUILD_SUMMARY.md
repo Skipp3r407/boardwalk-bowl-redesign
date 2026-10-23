@@ -164,3 +164,9 @@ Source pages: https://alomabowlingcenters.com/boardwalk/ and its public sub-page
 - `team-party.png` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/07/team-party.png
 - `ucf-thursday.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2026/09/ucf-thursday.jpg
 - `xZApRT-blk-and-red-new-mixed-menu-side-1.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2026/05/xZApRT-blk-and-red-new-mixed-menu-side-1.jpg
+
+### Rent a lane (added 2026-10-23, user request: customers rent a lane through the website)
+
+- `/rent-a-lane` (`components/lanes/LaneRental.tsx`, `LaneMap.tsx`, `lib/lanes.ts`): pick a day (next 14 days), bowlers and 1–3 hours → start times show how many lanes are left and the price → a bowling-alley lane map of all 80 lanes (wood lanes, arrows, pin decks; busy lanes dimmed) with neighbouring lanes pre-picked → shoes, bumpers, arcade card, bowler names for the Sync screens → contact + pay now / pay at desk → instant confirmation with lane numbers, desk code, add-to-calendar. Bookings are remembered on the device ("Your upcoming lanes").
+- Availability is a seeded demo shaped by the real schedule: Tuesday league night (limited), Thursday league night (none), the Oct 25 / Oct 27–29 tournament holds and the Thanksgiving closure. Production: read the lane management / POS feed and take payment with Square or Stripe. The same booking engine can back a phone app later.
+- Header, top bar, phone action bar, home hero and the Bowling page now go to "Rent a lane"; `/book` stays the party/event/league planner. `Service` + `ReserveAction` JSON-LD on the page.

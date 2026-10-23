@@ -19,7 +19,7 @@ import {
 import { BUSINESS, FALL_LEAGUES, FUN_PACK, LEAGUE_CONTACT, PARTY_PACKAGES } from "@/lib/site-data";
 
 const TYPES: { id: BookingType; title: string; blurb: string; icon: string }[] = [
-  { id: "lanes", title: "Bowling lanes", blurb: "Reserve lanes by the hour for your group", icon: "🎳" },
+  { id: "lanes", title: "Bowling lanes", blurb: "Pick your lanes on the live lane map and pay online", icon: "🎳" },
   { id: "birthday", title: "Kids’ birthday party", blurb: "Two packages, party host, 10+ kids", icon: "🎂" },
   { id: "event", title: "Group or company event", blurb: "Team building, Sweet 16, grads, The Bridge", icon: "🎉" },
   { id: "league", title: "Join a league", blurb: "15 fall leagues, beginners welcome", icon: "🏆" },
@@ -172,6 +172,7 @@ export function BookingFlow() {
                 key={t.id}
                 type="button"
                 onClick={() => {
+                  if (t.id === "lanes") { window.location.href = "/rent-a-lane"; return; }
                   setType(t.id);
                   setGuests(t.id === "birthday" ? 12 : t.id === "event" ? 25 : 6);
                   setStep(1);

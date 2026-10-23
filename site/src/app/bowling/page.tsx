@@ -144,7 +144,7 @@ export default function BowlingPage() {
 
       <CtaRibbon
         headline="Lock lane time or plan something bigger."
-        primary={{ label: "Request lanes online", href: `${PATH.book}?type=lanes` }}
+        primary={{ label: "Rent a lane online", href: PATH.rentLane }}
         secondary={{ label: "Host an event", href: PATH.parties }}
       />
     </>

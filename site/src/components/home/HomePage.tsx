@@ -90,10 +90,16 @@ export function HomePage() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                href={PATH.book}
+                href={PATH.rentLane}
                 className="rounded-full bg-gradient-to-r from-orange-500 to-rose-500 px-6 py-3 text-sm font-bold uppercase tracking-wide text-white shadow-xl shadow-orange-500/30 transition duration-200 hover:scale-[1.04] hover:brightness-110 hover:shadow-orange-500/45"
               >
-                Book lanes or a party
+                Rent a lane
+              </Link>
+              <Link
+                href={PATH.book}
+                className="rounded-full border border-orange-400/50 bg-orange-500/10 px-6 py-3 text-sm font-semibold text-white transition duration-200 hover:scale-[1.04]"
+              >
+                Plan a party
               </Link>
               <Link
                 href={PATH.bowling}

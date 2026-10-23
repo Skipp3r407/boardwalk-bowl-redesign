@@ -27,4 +27,5 @@ export const PATH = {
   privateEvents: "/private-events",
   promotions: "/promotions",
   book: "/book",
+  rentLane: "/rent-a-lane",
 } as const;
