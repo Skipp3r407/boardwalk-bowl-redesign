@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { SectionReveal } from "@/components/SectionReveal";
 import { ImageLightboxModal } from "@/components/ui/ImageLightboxModal";
-import { scrapedGalleryUrls, type ScrapePageKey } from "@/lib/boardwalk-page-images";
+import { altFromSrc, scrapedGalleryUrls, type ScrapePageKey } from "@/lib/boardwalk-page-images";
 
 export function ScrapedOnPageGallery({
   pageKey,
@@ -33,13 +33,13 @@ export function ScrapedOnPageGallery({
             <button
               key={src}
               type="button"
-              onClick={() => setLightbox({ src, alt: "" })}
+              onClick={() => setLightbox({ src, alt: altFromSrc(src) })}
               className="group/g relative aspect-[4/3] w-full cursor-zoom-in overflow-hidden rounded-xl border border-white/10 bg-slate-900 text-left transition duration-300 hover:-translate-y-1 hover:scale-[1.03] hover:border-cyan-400/45 hover:shadow-[0_16px_40px_-10px_rgba(34,211,238,0.3)] focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
-              aria-label="View image larger"
+              aria-label={`View larger: ${altFromSrc(src)}`}
             >
               <Image
                 src={src}
-                alt=""
+                alt={altFromSrc(src)}
                 fill
                 className="object-cover transition duration-500 group-hover/g:scale-110"
                 sizes="(max-width:1024px) 100vw, 33vw"

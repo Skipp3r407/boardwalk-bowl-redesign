@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { PageHero } from "@/components/PageHero";
 import { SpecialsGrid } from "@/components/specials/SpecialsGrid";
@@ -6,10 +7,14 @@ import { PATH } from "@/lib/paths";
 import { scrapedHero } from "@/lib/boardwalk-page-images";
 import { ScrapedOnPageGallery } from "@/components/scraped/ScrapedOnPageGallery";
 
-export const metadata: Metadata = {
-  title: "Promotions",
-  description: "Current promotions and flyers for Boardwalk Bowl in Orlando — specials, seasonal offers, and event graphics.",
-};
+export const metadata: Metadata = pageMeta({
+  title: "Deals & Promotions: Fun Pack, Winter Pass, Gift Cards",
+  description:
+    "Current Boardwalk Bowl deals: Friends & Family Fun Pack $59.99 a lane, Winter Pass $14, Black Friday and holiday gift card bonuses.",
+  path: "/promotions",
+  image: "/images/boardwalk/2026/FFFP-new-scaled.jpg",
+  imageAlt: "Friends and Family Fun Pack flyer",
+});
 
 export default function PromotionsPage() {
   return (

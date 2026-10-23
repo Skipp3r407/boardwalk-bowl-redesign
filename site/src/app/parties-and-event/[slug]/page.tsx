@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { pageMeta } from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
+import { breadcrumbJsonLd, faqJsonLd } from "@/lib/json-ld";
+import { PackagePicker } from "@/components/booking/PackagePicker";
 import { SectionReveal } from "@/components/SectionReveal";
 import { DemoForm } from "@/components/forms/DemoForm";
 import { FaqAccordion } from "@/components/FaqAccordion";
@@ -36,10 +40,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const cfg = EVENT_PAGES[slug as EventPageSlug];
   if (!cfg) return {};
-  return {
-    title: cfg.title,
-    description: cfg.description,
-  };
+  return pageMeta({
+    title: `${cfg.title} in Orlando`,
+    description: cfg.description.length > 158 ? `${cfg.description.slice(0, 155).replace(/\s+\S*$/, "")}…` : cfg.description,
+    path: `/parties-and-event/${slug}`,
+    image: scrapedHero(EVENT_SLUG_TO_SCRAPE_KEY[slug], "/images/boardwalk/2026/Book-Holiday-image.jpg"),
+    imageAlt: `${cfg.title} at Boardwalk Bowl`,
+  });
 }
 
 export default async function EventDetailPage({ params }: Props) {
@@ -55,9 +62,18 @@ export default async function EventDetailPage({ params }: Props) {
 
   return (
     <>
+      <JsonLd
+        data={[
+          faqJsonLd(cfg.faq),
+          breadcrumbJsonLd([
+            { name: "Parties & Events", path: PATH.parties },
+            { name: cfg.title, path: `/parties-and-event/${slug}` },
+          ]),
+        ]}
+      />
       <section className="relative overflow-hidden border-b border-white/10">
         <div className="absolute inset-0">
-          <Image src={heroBg} alt="" fill className="object-cover" priority sizes="100vw" />
+          <Image src={heroBg} alt={`${cfg.title} at Boardwalk Bowl in Orlando`} fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className={`absolute inset-0 bg-gradient-to-br ${themeHero[cfg.theme]}`} />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(34,211,238,0.12),transparent_45%)]" />
@@ -68,6 +84,12 @@ export default async function EventDetailPage({ params }: Props) {
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-slate-200 sm:text-xl">{cfg.description}</p>
           <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              href={`${PATH.book}?type=${slug === "kids-birthday-parties" ? "birthday" : "event"}`}
+              className="rounded-full bg-gradient-to-r from-orange-500 to-rose-500 px-5 py-2 text-sm font-bold text-white shadow-lg shadow-orange-500/30"
+            >
+              Request a date online
+            </Link>
             <a href={BUSINESS.phoneTel} className="rounded-full bg-white px-5 py-2 text-sm font-bold text-slate-950">
               Call {BUSINESS.phone}
             </a>
@@ -88,6 +110,12 @@ export default async function EventDetailPage({ params }: Props) {
         </div>
       </SectionReveal>
 
+      {slug === "kids-birthday-parties" && (
+        <SectionReveal className="mx-auto max-w-7xl px-4 pb-4">
+          <PackagePicker />
+        </SectionReveal>
+      )}
+
       <ScrapedOnPageGallery
         pageKey={scrapeKey}
         title="Gallery"
@@ -100,7 +128,7 @@ export default async function EventDetailPage({ params }: Props) {
           <div>
             <h2 className="font-[family-name:var(--font-display)] text-3xl text-white">{cfg.cta}</h2>
             <p className="mt-2 text-sm text-slate-400">
-              Production recommendation: embed Tripleseat or connect forms to your CRM — this is a styled demo form.
+              Prefer the full planner? <Link className="font-semibold text-cyan-300" href={PATH.book}>Request a date, time and package online</Link> — the events team confirms by phone or email.
             </p>
           </div>
           <DemoForm variant={formVariant} />

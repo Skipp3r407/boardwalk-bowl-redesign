@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import { PageHero } from "@/components/PageHero";
 import { GalleryLightbox } from "@/components/gallery/GalleryLightbox";
 import { scrapedHero } from "@/lib/boardwalk-page-images";
 import { ScrapedOnPageGallery } from "@/components/scraped/ScrapedOnPageGallery";
 
-export const metadata: Metadata = {
-  title: "Gallery",
-  description: "Photo gallery of Boardwalk Bowl — exterior, lanes, food, and experiences in Orlando.",
-};
+export const metadata: Metadata = pageMeta({
+  title: "Photo Gallery: Lanes, Arcade, Bar & Events",
+  description:
+    "Photos of Boardwalk Bowl in Orlando: 80 lanes, the arcade, billiards room, Brooklyn South bar, The Bridge Event Center and parties.",
+  path: "/gallery",
+  image: "/images/boardwalk/2026/100_0099-Jennifer-Halpern-scaled.jpg",
+  imageAlt: "Inside Boardwalk Bowl",
+});
 
 export default function GalleryPage() {
   return (

@@ -150,10 +150,10 @@ export function Header() {
             Call
           </a>
           <Link
-            href={PATH.parties}
+            href={PATH.book}
             className="rounded-full bg-gradient-to-r from-orange-500 to-rose-500 px-4 py-2 text-sm font-bold uppercase tracking-wide text-white shadow-lg shadow-orange-500/25 transition duration-200 hover:scale-105 hover:brightness-110 hover:shadow-orange-500/40"
           >
-            Events
+            Book
           </Link>
           </div>
         </div>
@@ -231,11 +231,11 @@ export function Header() {
                   Contact & directions
                 </Link>
                 <Link
-                  href={PATH.parties}
+                  href={PATH.book}
                   className="rounded-xl bg-gradient-to-r from-orange-500 to-rose-500 px-4 py-3 text-center text-sm font-bold text-white"
                   onClick={() => setMobileOpen(false)}
                 >
-                  Plan an event
+                  Book lanes or a party
                 </Link>
               </div>
             </div>

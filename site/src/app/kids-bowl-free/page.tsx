@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import { PageHero } from "@/components/PageHero";
 import { SectionReveal } from "@/components/SectionReveal";
 import { BUSINESS, KIDS_BOWL_FREE } from "@/lib/site-data";
 import { scrapedHero } from "@/lib/boardwalk-page-images";
 import { ScrapedOnPageGallery } from "@/components/scraped/ScrapedOnPageGallery";
 
-export const metadata: Metadata = {
-  title: "Kids Bowl Free",
+export const metadata: Metadata = pageMeta({
+  title: "Kids Bowl Free Summer Program in Orlando",
   description:
-    "Kids Bowl Free at Boardwalk Bowl — two free games per day for kids ages 2–15 during the published summer season; shoes not included.",
-};
+    "Kids Bowl Free at Boardwalk Bowl: registered kids ages 2–15 get 2 free games a day all summer. How to sign up, what's included and family pass options.",
+  path: "/kids-bowl-free",
+  image: "/images/boardwalk/2026/Arcade-Kids-Pic-scaled.jpg",
+  imageAlt: "Kids playing at Boardwalk Bowl",
+});
 
 export default function KidsBowlFreePage() {
   return (

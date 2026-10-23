@@ -30,7 +30,7 @@ export function TopCtaBar() {
             Plan an Event
           </Link>
           <Link
-            href={PATH.contact}
+            href={PATH.book}
             className="inline-flex shrink-0 rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] font-medium text-slate-100 transition duration-200 hover:scale-105 hover:border-cyan-400/50 hover:bg-cyan-500/15 hover:text-cyan-50 sm:text-sm"
           >
             Book Bowling

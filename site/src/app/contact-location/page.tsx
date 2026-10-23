@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { PageHero } from "@/components/PageHero";
 import { SectionReveal } from "@/components/SectionReveal";
@@ -9,11 +10,14 @@ import { PATH } from "@/lib/paths";
 import { scrapedHero } from "@/lib/boardwalk-page-images";
 import { ScrapedOnPageGallery } from "@/components/scraped/ScrapedOnPageGallery";
 
-export const metadata: Metadata = {
-  title: "Contact & Location",
+export const metadata: Metadata = pageMeta({
+  title: "Directions, Hours & Contact: 10749 E Colonial Dr",
   description:
-    "Visit Boardwalk Bowl at 10749 East Colonial Drive in Orlando — hours, map, parking, phone, and contact form.",
-};
+    "Find Boardwalk Bowl at 10749 East Colonial Drive, Orlando, FL 32817. Hours for every day, lane holds, holiday hours, phone 407-384-0003 and a contact form.",
+  path: "/contact-location",
+  image: "/images/boardwalk/2026/Boardwalk-Bowling-Front-View-Twilight-Jennifer-Halpern.jpg",
+  imageAlt: "Front of Boardwalk Bowl at twilight",
+});
 
 export default function ContactPage() {
   return (

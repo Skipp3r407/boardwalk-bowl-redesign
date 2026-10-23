@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { PageHero } from "@/components/PageHero";
 import { SectionReveal } from "@/components/SectionReveal";
@@ -10,11 +11,14 @@ import { scrapedHero } from "@/lib/boardwalk-page-images";
 import { ScrapedOnPageGallery } from "@/components/scraped/ScrapedOnPageGallery";
 import { ExpandableImage } from "@/components/ui/ExpandableImage";
 
-export const metadata: Metadata = {
-  title: "Parties & Events",
+export const metadata: Metadata = pageMeta({
+  title: "Parties & Event Venue in Orlando: Bowling, Bridge Event Center",
   description:
-    "Plan parties, corporate events, fundraisers, and celebrations at Boardwalk Bowl — The Bridge Event Center, catering, and attractions in one Orlando venue.",
-};
+    "Plan birthdays, company parties, team building, Sweet 16s, graduations and fundraisers at Boardwalk Bowl. Compare packages and request a date online.",
+  path: "/parties-and-event",
+  image: "/images/boardwalk/2026/Book-Holiday-image.jpg",
+  imageAlt: "A party group bowling at Boardwalk Bowl",
+});
 
 const cards: { slug: EventPageSlug; blurb: string }[] = [
   { slug: "the-bridge-event-center", blurb: "Receptions, banquets, ceremonies" },

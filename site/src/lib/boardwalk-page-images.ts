@@ -14,7 +14,24 @@ const EXCLUDE_SUBSTR = [
   "Logo-768",
   "brooklyn-south-logo",
   "Taco-Tango-Transparent",
+  "2023",
+  "2024",
 ];
+
+/** Descriptive alt text from a photo's file name, e.g. ".../Boardwalk-Bowling-Corn-Hole-Court.jpg" -> "Corn hole court at Boardwalk Bowl". */
+export function altFromSrc(src: string): string {
+  const leaf = (src.split("/").pop() || "").replace(/\.[a-z]+$/i, "");
+  const words = leaf
+    .replace(/-\d+x\d+$/, "")
+    .replace(/Jennifer-Halpern|scaled|Pana|e\d{6,}/gi, "")
+    .replace(/Boardwalk-Bowling-|Boardwalk-Bowl-|BWB-|^Boardwalk-?/gi, "")
+    .replace(/[-_]+/g, " ")
+    .replace(/(\d+|IMG|MG|UTA\d*|WSM|pic|image|new|copy)/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!words) return "Inside Boardwalk Bowl in Orlando";
+  return `${words.charAt(0).toUpperCase()}${words.slice(1).toLowerCase()} at Boardwalk Bowl`;
+}
 
 export function scrapedUrlsFor(key: ScrapePageKey): string[] {
   const arr = AS_ANY[key as string];

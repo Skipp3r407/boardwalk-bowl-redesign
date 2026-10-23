@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { PageHero } from "@/components/PageHero";
 import { SectionReveal } from "@/components/SectionReveal";
@@ -7,11 +8,14 @@ import { PATH } from "@/lib/paths";
 import { scrapedHero } from "@/lib/boardwalk-page-images";
 import { ScrapedOnPageGallery } from "@/components/scraped/ScrapedOnPageGallery";
 
-export const metadata: Metadata = {
-  title: "Private Events",
+export const metadata: Metadata = pageMeta({
+  title: "Private Events & Lane Buyouts in Orlando",
   description:
-    "Private events at Boardwalk Bowl and The Bridge Event Center — receptions, banquets, corporate programs, and hybrid celebrations with bowling and arcade add-ons.",
-};
+    "Private lanes, The Bridge Event Center and full-venue buyouts at Boardwalk Bowl for corporate events, receptions and large groups.",
+  path: "/private-events",
+  image: "/images/boardwalk/corp-pic.jpg",
+  imageAlt: "Corporate group event at Boardwalk Bowl",
+});
 
 export default function PrivateEventsPage() {
   return (

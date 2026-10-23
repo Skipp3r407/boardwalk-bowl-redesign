@@ -102,3 +102,65 @@ npm run build && npm start
 ```
 
 Vercel: set project root to `site/` (or monorepo equivalent).
+
+## October 2026 upgrade (Elevate Digital Studios)
+
+Checked against the live public pages on 2026-10-23. What changed:
+
+- **SEO:** unique title + meta description per page (`lib/seo.ts` `pageMeta()`), canonical URLs, Open Graph/Twitter images (real photos), `app/sitemap.ts`, `app/robots.ts`, one H1 per page, descriptive alt text (gallery alt generated from file names in `altFromSrc`).
+- **JSON-LD:** `BowlingAlley`+`EntertainmentBusiness` with opening hours (layout), `Event` for dated events (Specials page), `FAQPage` (FAQ, Bowling, Book, party pages), `BreadcrumbList`.
+- **Indexing switch:** this is an unofficial concept, so `robots.txt` disallows and pages carry `noindex` unless `NEXT_PUBLIC_ALLOW_INDEXING=true`. All SEO markup still ships.
+- **New `/book` request flow:** lanes / birthday / group event / league → date + start times from the real hours → guests → package or duration with a price estimate from the current rate card → contact → review → request number + .ics calendar file. Flags league nights and dated lane holds. Front-end only (production: Tripleseat / front-desk inbox).
+- **Party package picker** (`components/booking/PackagePicker.tsx`) on the kids' birthday page: both packages, headcount stepper, 18% gratuity + 3% admin estimate, 10-guest minimum.
+- **Specials page:** weekly specials typed out with today highlighted, happy hour, upcoming events (Latin Nights, Senior Expo Nov 4, Black Friday, Winter Pass), holiday hours; current flyers replace the April ones.
+- **Leagues page:** the 15-league 2026 fall schedule as a real table (was only an image on the live site).
+- **Data refresh (`lib/site-data.ts`):** current rates ($4.75/$5.75/$7.50 games, $24/$35/$45 hourly, $5 shoes, $11 billiards), dated lane holds, party packages, Fun Pack. Placeholder testimonials removed (no invented reviews).
+- Header/top bar/mobile bar "Book" buttons go to `/book`.
+
+### Fresh images (`public/images/boardwalk/2026/`, downloaded 2026-10-23, large files resized)
+
+Source pages: https://alomabowlingcenters.com/boardwalk/ and its public sub-pages (specials-events, bowling, parties-and-event/*, food-drinks, arcade, billiards, bowling-leagues, kids-bowl-free, contact-location, tournaments). Original URLs:
+
+- `100_0099-Jennifer-Halpern-scaled.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/06/100_0099-Jennifer-Halpern-scaled.jpg
+- `100_0344-Jennifer-Halpern.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/06/100_0344-Jennifer-Halpern.jpg
+- `100_0400-Jennifer-Halpern-scaled.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/06/100_0400-Jennifer-Halpern-scaled.jpg
+- `Arcade-Kids-Pic-scaled.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/06/Arcade-Kids-Pic-scaled.jpg
+- `BS-blk-bridge-transparency-e1753820242174.png` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/07/BS-blk-bridge-transparency-e1753820242174.png
+- `BWB-Birthday_Page_1-scaled.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/06/BWB-Birthday_Page_1-scaled.jpg
+- `BWB-Event-guide-combined.png` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2026/02/BWB-Event-guide-combined.png
+- `BWB-Fall-26.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2026/07/BWB-Fall-26.jpg
+- `BWB-Holiday-hours.pdf.png` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2026/10/BWB-Holiday-hours.pdf.png
+- `BWB-rates.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2026/08/BWB-rates.jpg
+- `BWB-specials.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2026/08/BWB-specials.jpg
+- `Black-Friday.png` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2026/10/Black-Friday.png
+- `Boardwalk--scaled.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/06/Boardwalk--scaled.jpg
+- `Boardwalk-Bowling-Boardwalk-Arcade-Jennifer-Halpern.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/06/Boardwalk-Bowling-Boardwalk-Arcade-Jennifer-Halpern.jpg
+- `Boardwalk-Bowling-Brooklyn-South-Billards-Jennifer-Halpern.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/06/Boardwalk-Bowling-Brooklyn-South-Billards-Jennifer-Halpern.jpg
+- `Boardwalk-Bowling-Corn-Hole-Court.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/06/Boardwalk-Bowling-Corn-Hole-Court.jpg
+- `Boardwalk-Bowling-Floor-Bar.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/06/Boardwalk-Bowling-Floor-Bar.jpg
+- `Boardwalk-Bowling-Front-View-Twilight-Jennifer-Halpern.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/06/Boardwalk-Bowling-Front-View-Twilight-Jennifer-Halpern.jpg
+- `Book-Holiday-image.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/04/Book-Holiday-image.jpg
+- `FFFP-new-scaled.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2026/09/FFFP-new-scaled.jpg
+- `Gift-cards.png` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2026/10/Gift-cards.png
+- `Kids-bday-pic-5-scaled.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/06/Kids-bday-pic-5-scaled.jpg
+- `League-photo.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/06/League-photo.jpg
+- `Nov-4-bw-expo-1.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2026/10/Nov-4-bw-expo-1.jpg
+- `October-2026-Calendar-Poster-scaled.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2026/09/October-2026-Calendar-Poster-scaled.jpg
+- `October-2026-Latin-Night-Flyer.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2026/09/October-2026-Latin-Night-Flyer.jpg
+- `Parties-image1.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/04/Parties-image1.jpg
+- `Parties-image2.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/04/Parties-image2.jpg
+- `Parties-image4.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/04/Parties-image4.jpg
+- `Taco-Tango-Transparent-Logo.png` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2026/01/Taco-Tango-Transparent-Logo.png
+- `Winter-Pass.png` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2026/10/Winter-Pass.png
+- `X92GlY-blk-and-red-new-mixed-menu-side-2.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2026/05/X92GlY-blk-and-red-new-mixed-menu-side-2.jpg
+- `adult-flyer.png` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2026/09/adult-flyer.png
+- `bigstock-Red-Felt-Billiard-Table-With-R-2836337.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/06/bigstock-Red-Felt-Billiard-Table-With-R-2836337.jpg
+- `corporate-pic.jpg.png` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/07/corporate-pic.jpg.png
+- `kids-bday-pic-2.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/06/kids-bday-pic-2.jpg
+- `kids-bday-pic.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/06/kids-bday-pic.jpg
+- `kids-flyer.png` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2026/09/kids-flyer.png
+- `league-bowler-discount-scaled.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2026/09/league-bowler-discount-scaled.jpg
+- `quinceanera-2.png` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/07/quinceanera-2.png
+- `team-party.png` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2025/07/team-party.png
+- `ucf-thursday.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2026/09/ucf-thursday.jpg
+- `xZApRT-blk-and-red-new-mixed-menu-side-1.jpg` ← https://alomabowlingcenters.com/boardwalk/wp-content/uploads/sites/2/2026/05/xZApRT-blk-and-red-new-mixed-menu-side-1.jpg

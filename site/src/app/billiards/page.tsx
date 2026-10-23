@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { PageHero } from "@/components/PageHero";
 import { SectionReveal } from "@/components/SectionReveal";
@@ -8,11 +9,14 @@ import { scrapedHero } from "@/lib/boardwalk-page-images";
 import { ScrapedOnPageGallery } from "@/components/scraped/ScrapedOnPageGallery";
 import { ExpandableImage } from "@/components/ui/ExpandableImage";
 
-export const metadata: Metadata = {
-  title: "Billiards · Brooklyn South",
+export const metadata: Metadata = pageMeta({
+  title: "Billiards in Orlando: $11/Hour Pool Tables",
   description:
-    "Brooklyn South Billiards at Boardwalk Bowl — six regulation pool tables, patio seating, TVs, and full bar access in Orlando.",
-};
+    "Brooklyn South Billiards at Boardwalk Bowl: regulation pool tables at $11 per hour per table, open late on weekends, steps from the bar and lanes.",
+  path: "/billiards",
+  image: "/images/boardwalk/2026/Boardwalk-Bowling-Brooklyn-South-Billards-Jennifer-Halpern.jpg",
+  imageAlt: "Pool tables in the Brooklyn South billiards room",
+});
 
 export default function BilliardsPage() {
   return (

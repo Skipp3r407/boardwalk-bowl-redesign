@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import { PageHero } from "@/components/PageHero";
 import { SectionReveal } from "@/components/SectionReveal";
 import { CtaRibbon } from "@/components/home/CtaRibbon";
@@ -7,11 +8,14 @@ import { scrapedHero } from "@/lib/boardwalk-page-images";
 import { ScrapedOnPageGallery } from "@/components/scraped/ScrapedOnPageGallery";
 import { ExpandableImage } from "@/components/ui/ExpandableImage";
 
-export const metadata: Metadata = {
-  title: "Arcade",
+export const metadata: Metadata = pageMeta({
+  title: "Arcade in East Orlando: Card Games, Tickets & Prizes",
   description:
-    "Boardwalk Bowl arcade in Orlando — reloadable card system, digital tickets, prize redemption, and games for all ages.",
-};
+    "Play racing, skill and prize games at the Boardwalk Bowl arcade in Orlando. Reloadable cards, digital tickets, games from 3 to 12 credits and a prize counter.",
+  path: "/arcade",
+  image: "/images/boardwalk/2026/Boardwalk-Bowling-Boardwalk-Arcade-Jennifer-Halpern.jpg",
+  imageAlt: "Arcade games glowing at Boardwalk Bowl",
+});
 
 export default function ArcadePage() {
   return (

@@ -3,8 +3,8 @@ import { Bebas_Neue, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { SiteChrome } from "@/components/site/SiteChrome";
 import { localBusinessJsonLd } from "@/lib/json-ld";
-import { BUSINESS } from "@/lib/site-data";
-import { SITE_URL } from "@/lib/site-url";
+import { ALLOW_INDEXING, SITE_URL } from "@/lib/site-url";
+import { JsonLd } from "@/components/JsonLd";
 
 const display = Bebas_Neue({
   weight: "400",
@@ -20,10 +20,15 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Boardwalk Bowl | Orlando Bowling, Arcade & Events",
+    default: "Boardwalk Bowl | 80-Lane Bowling, Arcade & Parties in Orlando",
     template: "%s | Boardwalk Bowl",
   },
-  description: `${BUSINESS.legalName} on East Colonial — 80 lanes, Brunswick Sync, arcade, billiards, leagues, tournaments, and private events.`,
+  description:
+    "80 lanes, cosmic bowling, arcade, billiards and a bar & grill on East Colonial Drive in Orlando. See today's special and request lanes or a party online.",
+  applicationName: "Boardwalk Bowl",
+  alternates: { canonical: "/" },
+  robots: ALLOW_INDEXING ? { index: true, follow: true } : { index: false, follow: true },
+  formatDetection: { telephone: true, address: true },
   keywords: [
     "Orlando bowling",
     "Boardwalk Bowl",
@@ -46,7 +51,7 @@ export const metadata: Metadata = {
         url: "/images/boardwalk/Boardwalk-Bowling-Front-View-Twilight-1536x1097.jpg",
         width: 1536,
         height: 1097,
-        alt: "Boardwalk Bowl exterior at twilight",
+        alt: "Boardwalk Bowl on East Colonial Drive in Orlando at twilight",
       },
     ],
   },
@@ -54,6 +59,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Boardwalk Bowl | Orlando Bowling & Entertainment",
     description: "80 lanes, arcade, billiards, food & drinks, leagues, and events.",
+    images: ["/images/boardwalk/Boardwalk-Bowling-Front-View-Twilight-1536x1097.jpg"],
   },
 };
 
@@ -66,10 +72,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${display.variable} ${dmSans.variable} h-full scroll-smooth`}>
       <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        <JsonLd data={jsonLd} />
       </head>
       <body className={`${dmSans.className} min-h-full antialiased`}>
         <div className="relative z-10 min-h-full">

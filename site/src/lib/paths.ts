@@ -26,4 +26,5 @@ export const PATH = {
   gallery: "/gallery",
   privateEvents: "/private-events",
   promotions: "/promotions",
+  book: "/book",
 } as const;

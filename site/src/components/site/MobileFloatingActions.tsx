@@ -25,11 +25,11 @@ export function MobileFloatingActions() {
           Directions
         </a>
         <Link
-          href={PATH.parties}
+          href={PATH.book}
           className="flex flex-1 flex-col items-center rounded-xl bg-gradient-to-br from-orange-500 to-rose-500 px-2 py-2 text-center text-[11px] font-bold text-white transition duration-200 hover:scale-105 hover:shadow-[0_0_24px_-4px_rgba(251,146,60,0.55)]"
         >
           <span className="text-lg">🎉</span>
-          Book event
+          Book online
         </Link>
       </div>
     </div>

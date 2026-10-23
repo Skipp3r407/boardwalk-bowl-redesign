@@ -70,24 +70,33 @@ export const LANE_RECURRING_NOTES = [
   "Thursday | 6:30–9:30 p.m. | League — no lanes",
 ] as const;
 
+/** Dated lane holds and holiday changes as listed on the live site footer (checked 2026-10-23). */
+export const LANE_DATED_NOTES = [
+  { date: "2026-10-25", label: "Sun, Oct 25", note: "11 a.m.–3 p.m. · No lanes" },
+  { date: "2026-10-28", label: "Tue–Wed, Oct 27–28", note: "All day · HS State · No lanes" },
+  { date: "2026-10-29", label: "Thu, Oct 29", note: "Open–7 p.m. · HS State · No lanes" },
+  { date: "2026-11-26", label: "Thu, Nov 26", note: "Closed · Happy Thanksgiving" },
+  { date: "2026-11-27", label: "Fri, Nov 27", note: "Opens 10 a.m. · Black Friday" },
+] as const;
+
 export const BOWLING_RATES = {
   perGame: [
-    { label: "Mon–Fri · Open–5pm", price: "$4.50" },
-    { label: "Sat & Sun · Open–5pm", price: "$5.50" },
-    { label: "Sun–Thu · 5pm–close", price: "$5.50" },
-    { label: "Fri & Sat · 5pm–close", price: "$7.00" },
+    { label: "Mon–Fri · Open–5pm", price: "$4.75" },
+    { label: "Sat & Sun · Open–5pm", price: "$5.75" },
+    { label: "Sun–Thu · 5pm–close", price: "$5.75" },
+    { label: "Fri & Sat · 5pm–close", price: "$7.50" },
   ],
   perHour: [
-    { label: "Mon–Fri · Open–5pm", price: "$22" },
-    { label: "Sat & Sun · Open–5pm", price: "$32" },
-    { label: "Sun–Thu · 5pm–close", price: "$32" },
-    { label: "Fri & Sat · 5pm–close", price: "$42" },
+    { label: "Mon–Fri · Open–5pm", price: "$24" },
+    { label: "Sat & Sun · Open–5pm", price: "$35" },
+    { label: "Sun–Thu · 5pm–close", price: "$35" },
+    { label: "Fri & Sat · 5pm–close", price: "$45" },
   ],
-  shoes: "$4",
+  shoes: "$5",
 } as const;
 
 export const BILLIARDS_RATES = {
-  table: "$10 per hour per table (per table, not per person — split with your group)",
+  table: "$11 per hour per table (per table, not per person — split with your group)",
 } as const;
 
 export const KIDS_BOWL_FREE = {
@@ -135,25 +144,136 @@ export const FEATURED_VIDEOS = [
   },
 ] as const;
 
-export const TESTIMONIALS_PLACEHOLDER = [
+/** Weekly specials, typed out from the live "BWB-specials" flyer (2026). Day index: 0 = Sunday. */
+export const DAILY_SPECIALS = [
+  { day: 0, name: "Sunday Fun Day", time: "Open–noon", deals: ["$4.00 games", "All-day Family Pack $34.99: 1 hour of bowling + up to 6 pairs of shoes"] },
+  { day: 1, name: "Monday Half-Off", time: "6pm–close", deals: ["50% off the hourly bowling rate", "Arcade games & billiards"] },
+  { day: 2, name: "Twice on Tuesdays", time: "Open–5pm & 10pm–close", deals: ["$3 games", "$2 shoes"] },
+  { day: 3, name: "Wine Down Wednesdays", time: "9pm–close", deals: ["$5 house wines, Twisted Tea & SunCruiser cans", "$8 personal cheese pizza (+$1 a topping)", "All-you-can-bowl $13"] },
+  { day: 4, name: "Thursday College Knights", time: "9:30pm–close", deals: ["$3 games", "$3 shoes", "$3 domestic drafts", "$11/hour billiards"] },
+  { day: 5, name: "Cosmic Fridays", time: "11pm–close", deals: ["$15 all-you-can-bowl under the cosmic lights"] },
+  { day: 6, name: "Cosmic Saturdays", time: "11pm–close", deals: ["$15 all-you-can-bowl under the cosmic lights"] },
+] as const;
+
+export const HAPPY_HOUR = {
+  when: "Monday–Friday · 3–6pm",
+  deals: ["$2 off select apps", "$4 drafts", "$4 wells"],
+  allDay: "All day, every day: Bacardi, Captain Morgan & Smirnoff — $6 singles / $10 doubles",
+} as const;
+
+/** Friends & Family Fun Pack (live "FFFP" flyer). */
+export const FUN_PACK = {
+  price: "$59.99 + tax per lane",
+  people: "Up to 5 people per lane",
+  includes: ["2 hours of bowling", "Shoe rental", "Sodas", "1 large one-topping pizza"],
+  when: "Monday–Friday · Open–5pm",
+  note: "Walk-in special only — not available for reservation.",
+} as const;
+
+/** Kids’ birthday packages from the live birthday flyer. Prices per child, before 18% gratuity, 3% admin fee and tax. */
+export const PARTY_PACKAGES = [
   {
-    quote:
-      "Huge venue, great energy, and the staff keeps everything moving. Our group loved the arcade after bowling.",
-    name: "Orlando guest",
-    role: "Weekend visit",
+    id: "fun-pizza",
+    name: "Fun + Pizza",
+    pricePerChild: 22.99,
+    includes: ["2 hours of bowling with shoes", "Pizza (2 slices per child)", "Soft drinks"],
   },
   {
-    quote:
-      "We hosted a team night here — lanes, food, and space to spread out. Easier than herding people across multiple spots downtown.",
-    name: "Local manager",
-    role: "Team outing",
+    id: "fun-food-arcade",
+    name: "Fun + Food + Arcade",
+    pricePerChild: 26.99,
+    includes: [
+      "2 hours of bowling with shoes",
+      "Pizza (2 slices per child) or chicken tenders",
+      "Soft drinks",
+      "$5 arcade card per child",
+      "Birthday child receives 500 tickets",
+    ],
+  },
+] as const;
+
+export const PARTY_TERMS = {
+  gratuity: 0.18,
+  adminFee: 0.03,
+  minGuests: 10,
+  allPackages:
+    "Every package includes a party host, place settings, and a free game of bowling for each guest to use on a future visit.",
+  availability:
+    "Monday–Thursday any time; Friday–Sunday open–5pm. Evening parties after 5pm depend on availability, with an evening up-charge.",
+} as const;
+
+/** 2026 Fall league schedule, typed out from the live schedule image. */
+export const FALL_LEAGUES = [
+  { day: "Monday", name: "Fairways Palm Valley", starts: "Meet Sept 28 · Start Oct 5", time: "10:30 AM", team: 4, weeks: "26", cost: "$12", type: "Senior · fun, social" },
+  { day: "Monday", name: "Home School", starts: "Meet Aug 17 · Start Sept 14", time: "1:00 PM", team: 4, weeks: "3 × 10 wks", cost: "$12", type: "Youth · USBC" },
+  { day: "Monday", name: "Practice with a Purpose", starts: "Ongoing", time: "6:30 PM", team: 1, weeks: "—", cost: "$10", type: "Youth practice with coaches" },
+  { day: "Monday", name: "Breathe Easy", starts: "Meet Aug 24 · Start Aug 31", time: "6:30 PM", team: 4, weeks: "36", cost: "$20", type: "Social · competitive · USBC" },
+  { day: "Monday", name: "JR Gold Sport", starts: "Meet & start Aug 3", time: "5:30 PM", team: 1, weeks: "12", cost: "$16", type: "Youth · sport shot · USBC" },
+  { day: "Tuesday", name: "Central Florida Classic", starts: "Meet Aug 25 · Start Sept 1", time: "7:15 PM", team: 4, weeks: "36", cost: "$30", type: "Social · competitive · USBC" },
+  { day: "Wednesday", name: "Practice Makes Perfect", starts: "Meet & start Sept 30", time: "6:30 PM", team: 4, weeks: "16", cost: "$18", type: "Social and fun" },
+  { day: "Wednesday", name: "Lousy Bowlers Club", starts: "Meet & start Sept 23", time: "6:30 PM", team: 1, weeks: "8", cost: "$99 / 8 wks", type: "Learn to bowl from coaches" },
+  { day: "Thursday", name: "Realm", starts: "Meet & start Sept 10", time: "12:30 PM", team: 4, weeks: "32", cost: "$12", type: "Senior · fun, social · USBC" },
+  { day: "Thursday", name: "Boardwalkers", starts: "Meet Aug 20 · Start Aug 27", time: "6:30 PM", team: 4, weeks: "32", cost: "$20", type: "Social · competitive · USBC" },
+  { day: "Thursday", name: "Guys & Dolls", starts: "Meet Aug 27 · Start Sept 3", time: "6:45 PM", team: 4, weeks: "36", cost: "$23", type: "Social · competitive · USBC" },
+  { day: "Friday", name: "TGIF", starts: "Meet Aug 28 · Start Sept 4", time: "6:30 PM", team: 4, weeks: "36", cost: "$20", type: "Social · competitive · USBC" },
+  { day: "Saturday", name: "Youth", starts: "Meet & start Aug 15", time: "10:00 AM", team: 4, weeks: "4 × 8 wks", cost: "$12", type: "Youth · USBC" },
+  { day: "Saturday", name: "Brewmasters", starts: "Meet & start Sept 12", time: "6:30 PM", team: 4, weeks: "17", cost: "$17", type: "Social and fun · every other week" },
+  { day: "Sunday", name: "Adult/Youth", starts: "Meet & start Aug 30", time: "5:30 PM", team: 2, weeks: "8", cost: "$12", type: "1 adult + 1 youth · every other week · USBC" },
+] as const;
+
+export const LEAGUE_CONTACT = "bwbleagues@alomabowlingcenters.com";
+
+/** Dated events and seasonal offers from the live Specials & Events page (checked 2026-10-23). */
+export const UPCOMING_EVENTS = [
+  {
+    id: "latin-nights",
+    name: "Latin Nights Fridays at The Bridge",
+    start: "2026-10-23T19:00:00-04:00",
+    end: "2026-10-30T23:59:00-04:00",
+    when: "Fridays in October · doors 7pm · no cover",
+    detail: "Live salsa bands every Friday: Oct 23 Rika Rumba, Oct 30 El Grupo Urbanizz Express. Full bar & grill.",
+    image: "/images/boardwalk/2026/October-2026-Latin-Night-Flyer.jpg",
+    free: true,
   },
   {
-    quote:
-      "Kids Bowl Free was a win for our summer routine. Quick trip, predictable fun, and the crew is friendly with first-timers.",
-    name: "East Orlando parent",
-    role: "Family outing",
+    id: "senior-expo",
+    name: "Senior Fun, Bowling & Wellness Expo",
+    start: "2026-11-04T10:00:00-05:00",
+    end: "2026-11-04T14:00:00-05:00",
+    when: "Wednesday, Nov 4 · 10am–2pm",
+    detail: "Win prizes, free lunch buffet, bowling, and health & wellness resources. Register with the events office: 407-384-0003 ext. 1.",
+    image: "/images/boardwalk/2026/Nov-4-bw-expo-1.jpg",
+    free: true,
   },
+  {
+    id: "black-friday",
+    name: "Black Friday Gift Cards & Bowling Special",
+    start: "2026-11-27T10:00:00-05:00",
+    end: "2026-11-27T17:00:00-05:00",
+    when: "Friday, Nov 27 · opens 10am",
+    detail: "Buy $50 get $20, buy $100 get $50 in gift cards all day. Open–5pm: $14 for 2 games, shoes and a $5 arcade card.",
+    image: "/images/boardwalk/2026/Black-Friday.png",
+    free: false,
+  },
+  {
+    id: "winter-pass",
+    name: "Winter Pass",
+    start: "2026-12-21T10:00:00-05:00",
+    end: "2027-01-04T17:00:00-05:00",
+    when: "Dec 21 – Jan 4 · open–5pm every day (not NYE)",
+    detail: "$14 per person: 2 games of bowling, shoes and a $5 arcade card.",
+    image: "/images/boardwalk/2026/Winter-Pass.png",
+    free: false,
+  },
+] as const;
+
+export const HOLIDAY_HOURS = [
+  { date: "Nov 26 · Thanksgiving", hours: "Closed" },
+  { date: "Nov 27 · Black Friday", hours: "Opens 10 AM" },
+  { date: "Dec 24 · Christmas Eve", hours: "10 AM – 6 PM" },
+  { date: "Dec 25 · Christmas Day", hours: "Opens 3 PM" },
+  { date: "Dec 31 · New Year’s Eve", hours: "Opens 10 AM" },
+  { date: "Jan 1 · New Year’s Day", hours: "Opens Noon" },
 ] as const;
 
 /** Opening paragraph(s) from the live Boardwalk Bowl homepage (alomabowlingcenters.com/boardwalk/), preserved for fidelity. */

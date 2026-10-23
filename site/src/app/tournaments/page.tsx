@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { PageHero } from "@/components/PageHero";
 import { SectionReveal } from "@/components/SectionReveal";
@@ -8,11 +9,14 @@ import { PATH } from "@/lib/paths";
 import { scrapedHero } from "@/lib/boardwalk-page-images";
 import { ScrapedOnPageGallery } from "@/components/scraped/ScrapedOnPageGallery";
 
-export const metadata: Metadata = {
-  title: "Tournaments",
+export const metadata: Metadata = pageMeta({
+  title: "Bowling Tournaments in Orlando: Host or Compete",
   description:
-    "Host or attend bowling tournaments at Boardwalk Bowl — 80 Brunswick lanes, flexible 48/32 configuration, massive concourse, and full-service amenities in Orlando.",
-};
+    "Bowling tournaments at Boardwalk Bowl, the largest bowling center in the Southeast with 80 lanes. Upcoming hosted events and how to book your tournament.",
+  path: "/tournaments",
+  image: "/images/boardwalk/2026/100_0400-Jennifer-Halpern-scaled.jpg",
+  imageAlt: "Tournament bowlers at Boardwalk Bowl",
+});
 
 const hosted = [
   "PBA National and Regional Tour Stops",

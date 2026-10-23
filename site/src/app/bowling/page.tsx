@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import { PageHero } from "@/components/PageHero";
 import { SectionReveal } from "@/components/SectionReveal";
 import { FaqAccordion } from "@/components/FaqAccordion";
@@ -8,12 +9,17 @@ import { PATH } from "@/lib/paths";
 import { scrapedHero } from "@/lib/boardwalk-page-images";
 import { ScrapedOnPageGallery } from "@/components/scraped/ScrapedOnPageGallery";
 import { ExpandableImage } from "@/components/ui/ExpandableImage";
+import { JsonLd } from "@/components/JsonLd";
+import { breadcrumbJsonLd, faqJsonLd } from "@/lib/json-ld";
 
-export const metadata: Metadata = {
-  title: "Bowling",
+export const metadata: Metadata = pageMeta({
+  title: "Bowling Prices & Hours: 80 Lanes in Orlando",
   description:
-    "Open play and hourly bowling rates at Boardwalk Bowl in Orlando — 80 lanes, Brunswick Sync interactive games, cosmic bowling, and shoe rental pricing.",
-};
+    "Current Boardwalk Bowl rates: games from $4.75, lanes from $24 an hour, $5 shoes. 80 lanes with Brunswick Sync, cosmic bowling and bumpers in East Orlando.",
+  path: "/bowling",
+  image: "/images/boardwalk/Boardwalk-Bowling-Bowling-Lanes-3-Jennifer-Halpern.jpg",
+  imageAlt: "Rows of lanes at Boardwalk Bowl",
+});
 
 const faq = [
   {
@@ -26,16 +32,17 @@ const faq = [
   },
   {
     q: "When are lanes limited?",
-    a: "League nights and tournaments can reduce availability. Tuesday evenings typically see limited lanes; Thursday league windows may remove lanes entirely—call ahead to confirm tonight’s status.",
+    a: "League nights and tournaments reduce availability: Tuesday 6:30–9:30 pm has limited lanes and Thursday 6:30–9:30 pm has no open lanes. The online lane request flags these times as you pick.",
   },
 ];
 
 export default function BowlingPage() {
   return (
     <>
+      <JsonLd data={[faqJsonLd(faq), breadcrumbJsonLd([{ name: "Bowling", path: "/bowling" }])]} />
       <PageHero
         eyebrow="Open play · leagues · cosmic nights"
-        title="Bowling built for every crew"
+        title="Bowling in Orlando: 80 lanes, current prices"
         subtitle="Eighty lanes. Brunswick Sync scoring. Interactive games layered on classic 10‑pin—Orlando’s largest bowling floor, dialed for families, date nights, and serious league nights alike."
         imageSrc={scrapedHero(
           "bowling",
@@ -137,7 +144,7 @@ export default function BowlingPage() {
 
       <CtaRibbon
         headline="Lock lane time or plan something bigger."
-        primary={{ label: "Call the house", href: BUSINESS.phoneTel }}
+        primary={{ label: "Request lanes online", href: `${PATH.book}?type=lanes` }}
         secondary={{ label: "Host an event", href: PATH.parties }}
       />
     </>

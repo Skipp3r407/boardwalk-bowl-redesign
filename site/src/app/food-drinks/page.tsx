@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { PageHero } from "@/components/PageHero";
 import { SectionReveal } from "@/components/SectionReveal";
@@ -7,11 +8,14 @@ import { PATH } from "@/lib/paths";
 import { scrapedHero } from "@/lib/boardwalk-page-images";
 import { ScrapedOnPageGallery } from "@/components/scraped/ScrapedOnPageGallery";
 
-export const metadata: Metadata = {
-  title: "Food & Drinks",
+export const metadata: Metadata = pageMeta({
+  title: "Brooklyn South Bar & Grill: Food, Drinks & Happy Hour",
   description:
-    "Brooklyn South Bar & Grill inside Boardwalk Bowl — pizzas, burgers, appetizers, full bar, Happy Hour specials, takeout, Uber Eats, and Grubhub.",
-};
+    "Eat and drink at Brooklyn South Bar & Grill inside Boardwalk Bowl: pizza, wings, apps, $4 drafts and wells at happy hour (Mon–Fri 3–6pm), plus delivery.",
+  path: "/food-drinks",
+  image: "/images/boardwalk/2026/Boardwalk-Bowling-Floor-Bar.jpg",
+  imageAlt: "The bar at Brooklyn South inside Boardwalk Bowl",
+});
 
 export default function FoodDrinksPage() {
   return (

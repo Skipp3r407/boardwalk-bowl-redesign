@@ -10,7 +10,7 @@ import {
   HOMEPAGE_ARCADE_SPOTLIGHT,
   HOME_INTRO_SCRAPED,
   STATS_STRIP,
-  TESTIMONIALS_PLACEHOLDER,
+  LANE_DATED_NOTES,
 } from "@/lib/site-data";
 import { PATH } from "@/lib/paths";
 import { scrapedHero } from "@/lib/boardwalk-page-images";
@@ -18,6 +18,8 @@ import { ScrapedOnPageGallery } from "@/components/scraped/ScrapedOnPageGallery"
 import { HomeFlyerTiles } from "@/components/home/HomeFlyerTiles";
 import { ExpandableImage } from "@/components/ui/ExpandableImage";
 import { HeroGridFadeOverlay } from "@/components/home/HeroGridFadeOverlay";
+import { TodaySpecial } from "@/components/specials/TodaySpecial";
+import { UpcomingEvents } from "@/components/specials/UpcomingEvents";
 
 const homeHeroSrc = scrapedHero(
   "home",
@@ -75,6 +77,9 @@ export function HomePage() {
             <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-200/90">Orlando · East Colonial</p>
             <h1 className="mt-4 font-[family-name:var(--font-display)] text-5xl leading-[0.95] tracking-[0.04em] text-white sm:text-6xl md:text-7xl">
               <span className="hero-gradient-text">BOARDWALK BOWL</span>
+              <span className="mt-2 block text-2xl tracking-[0.12em] text-cyan-100 sm:text-3xl md:text-4xl">
+                80-lane bowling, arcade &amp; parties in Orlando
+              </span>
             </h1>
             <p className="mt-3 max-w-xl text-sm font-semibold uppercase tracking-[0.2em] text-fuchsia-200/85 md:text-base">
               {BOWLING_FUN_COPY.heroTagline}
@@ -85,10 +90,10 @@ export function HomePage() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                href={PATH.parties}
+                href={PATH.book}
                 className="rounded-full bg-gradient-to-r from-orange-500 to-rose-500 px-6 py-3 text-sm font-bold uppercase tracking-wide text-white shadow-xl shadow-orange-500/30 transition duration-200 hover:scale-[1.04] hover:brightness-110 hover:shadow-orange-500/45"
               >
-                Plan an Event
+                Book lanes or a party
               </Link>
               <Link
                 href={PATH.bowling}
@@ -517,24 +522,25 @@ export function HomePage() {
         </div>
       </SectionReveal>
 
-      {/* Testimonials */}
+      {/* Today + coming up (replaces placeholder testimonials: real info only) */}
       <SectionReveal className="mx-auto max-w-7xl px-4 py-16">
-        <h2 className="text-center font-[family-name:var(--font-display)] text-3xl text-white">Guests are talking</h2>
-        <p className="mx-auto mt-2 max-w-xl text-center text-sm text-slate-500">
-          Placeholder social proof styled for pitch—swap with real reviews or UGC.
-        </p>
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
-          {TESTIMONIALS_PLACEHOLDER.map((t) => (
-            <blockquote
-              key={t.name}
-              className="glass-panel glass-panel-static rounded-2xl p-6 text-slate-300"
-            >
-              <p className="text-sm leading-relaxed text-slate-200">“{t.quote}”</p>
-              <footer className="mt-4 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                {t.name} · {t.role}
-              </footer>
-            </blockquote>
-          ))}
+        <p className="text-center text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">Know before you go</p>
+        <h2 className="mt-2 text-center font-[family-name:var(--font-display)] text-3xl text-white md:text-4xl">Today’s special &amp; what’s coming up</h2>
+        <div className="mt-10">
+          <TodaySpecial />
+        </div>
+        <div className="mt-10">
+          <UpcomingEvents />
+        </div>
+        <div className="mt-8 rounded-2xl border border-amber-400/25 bg-amber-500/5 p-5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-amber-200">Lane holds</p>
+          <ul className="mt-2 grid gap-1 text-sm text-slate-300 sm:grid-cols-2">
+            {LANE_DATED_NOTES.map((n) => (
+              <li key={n.date}>
+                <span className="font-semibold text-white">{n.label}:</span> {n.note}
+              </li>
+            ))}
+          </ul>
         </div>
       </SectionReveal>
 

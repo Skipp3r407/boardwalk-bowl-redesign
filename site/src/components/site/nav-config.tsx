@@ -37,6 +37,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: "More",
     items: [
+      { label: "Book Online", href: PATH.book },
       { label: "Specials & Events", href: PATH.specialsEvents },
       { label: "Promotions", href: PATH.promotions },
       { label: "Food & Drinks", href: PATH.foodDrinks },
@@ -51,6 +52,6 @@ export const NAV_GROUPS: NavGroup[] = [
 
 export const PRIMARY_CTAS = [
   { label: "Plan an Event", href: PATH.parties },
-  { label: "Book Bowling", href: PATH.contact, variant: "secondary" as const },
+  { label: "Book Bowling", href: PATH.book, variant: "secondary" as const },
   { label: "View Specials", href: PATH.specialsEvents, variant: "ghost" as const },
 ];

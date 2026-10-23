@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import { PageHero } from "@/components/PageHero";
 import { SectionReveal } from "@/components/SectionReveal";
 import { DemoForm } from "@/components/forms/DemoForm";
 import { scrapedHero } from "@/lib/boardwalk-page-images";
 import { ScrapedOnPageGallery } from "@/components/scraped/ScrapedOnPageGallery";
 
-export const metadata: Metadata = {
-  title: "Employment",
+export const metadata: Metadata = pageMeta({
+  title: "Now Hiring in East Orlando: Bowling Center Jobs",
   description:
-    "Careers at Boardwalk Bowl — flexible schedules, upbeat environment, growth opportunities, and employee perks including bowling and arcade discounts.",
-};
+    "Apply to work at Boardwalk Bowl: front desk, bar and grill, events and maintenance roles at East Orlando's 80-lane entertainment center.",
+  path: "/employment",
+  image: "/images/boardwalk/Boardwalk-Bowling-Rental-Desk-Jennifer-Halpern-1.png",
+  imageAlt: "Shoe rental desk at Boardwalk Bowl",
+});
 
 export default function EmploymentPage() {
   return (
