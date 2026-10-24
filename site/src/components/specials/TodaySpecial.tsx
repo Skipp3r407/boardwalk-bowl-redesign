@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { DAILY_SPECIALS, HAPPY_HOUR } from "@/lib/site-data";
+import { useAdmin } from "@/lib/admin-store";
 
 const subscribe = () => () => {};
 const DAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -9,10 +10,12 @@ const DAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "
 /** The whole week of specials with today's card lit up (today is read on the client, so the static page stays cacheable). */
 export function TodaySpecial() {
   const today = useSyncExternalStore(subscribe, () => new Date().getDay(), () => -1);
+  const admin = useAdmin();
+  const off = new Set(admin?.specials.filter((x) => !x.active).map((x) => x.day) ?? []);
   return (
     <div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {DAILY_SPECIALS.map((s) => {
+        {DAILY_SPECIALS.filter((s) => !off.has(s.day)).map((s) => {
           const on = s.day === today;
           return (
             <article

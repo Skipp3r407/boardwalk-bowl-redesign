@@ -11,6 +11,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Bowling", href: PATH.bowling },
       { label: "Rent a Lane", href: PATH.rentLane },
       { label: "Arcade", href: PATH.arcade },
+      { label: "Gift & Game Cards", href: PATH.giftCards },
       { label: "Billiards", href: PATH.billiards },
       { label: "Tournaments", href: PATH.tournaments },
       { label: "Kids Bowl Free", href: PATH.kidsBowlFree },

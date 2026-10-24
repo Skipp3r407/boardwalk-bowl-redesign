@@ -6,6 +6,7 @@ const PRIORITY: Partial<Record<string, number>> = {
   [PATH.home]: 1,
   [PATH.book]: 0.9,
   [PATH.rentLane]: 0.95,
+  [PATH.giftCards]: 0.85,
   [PATH.bowling]: 0.9,
   [PATH.parties]: 0.9,
   [PATH.partiesKids]: 0.9,

@@ -71,7 +71,7 @@ export default function ArcadePage() {
 
       <CtaRibbon
         headline="Perfect after bowling—stay for the high scores."
-        primary={{ label: "See bowling", href: PATH.bowling }}
+        primary={{ label: "Load a game card", href: PATH.giftCards }}
         secondary={{ label: "Plan a party", href: PATH.parties }}
       />
     </>

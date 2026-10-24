@@ -18,6 +18,7 @@ import {
 } from "@/lib/lanes";
 import { BUSINESS } from "@/lib/site-data";
 import { PATH } from "@/lib/paths";
+import { adminBlocked, checkDiscount, findGiftCard, lanePrice, tierFor, updateAdmin, useAdmin } from "@/lib/admin-store";
 
 const subscribe = () => () => {};
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -42,11 +43,12 @@ function StepTitle({ n, title, done }: { n: number; title: string; done?: boolea
 
 export function LaneRental() {
   const today = useSyncExternalStore(subscribe, () => iso(new Date()), () => "");
+  const admin = useAdmin();
   const days = useMemo(() => {
     if (!today) return [];
     const [y, m, d] = today.split("-").map(Number);
-    return Array.from({ length: 14 }, (_, i) => new Date(y, m - 1, d + i));
-  }, [today]);
+    return Array.from({ length: admin?.bookingWindowDays ?? 14 }, (_, i) => new Date(y, m - 1, d + i));
+  }, [today, admin?.bookingWindowDays]);
 
   const [date, setDate] = useState("");
   const [guests, setGuests] = useState(4);
@@ -61,6 +63,11 @@ export function LaneRental() {
   const [contact, setContact] = useState({ name: "", phone: "", email: "", texts: true });
   const [pay, setPay] = useState<"now" | "desk">("now");
   const [done, setDone] = useState<SavedBooking | null>(null);
+  const [promoInput, setPromoInput] = useState("");
+  const [promoCode, setPromoCode] = useState("");
+  const [giftInput, setGiftInput] = useState("");
+  const [giftCode, setGiftCode] = useState("");
+  const [payMsg, setPayMsg] = useState("");
   const upcoming = useSyncExternalStore(
     subscribe,
     () => JSON.stringify(loadBookings().filter((b) => b.date >= iso(new Date())).slice(0, 3)),
@@ -69,13 +76,45 @@ export function LaneRental() {
   const myBookings: SavedBooking[] = done ? [] : JSON.parse(upcoming);
 
   const minutes = hours * 60;
-  const lanesNeeded = laneCount ?? Math.max(1, Math.ceil(guests / MAX_PER_LANE));
-  const slots = useMemo(() => (date ? slotsWithAvailability(date, minutes) : []), [date, minutes]);
-  const busy = useMemo(() => (date && start !== null ? busyLanes(date, start, minutes) : new Set<number>()), [date, start, minutes]);
+  const perLane = admin?.maxPerLane ?? MAX_PER_LANE;
+  const lanesNeeded = laneCount ?? Math.max(1, Math.ceil(guests / perLane));
+  // busy = the house's demo traffic + the owner's closures/holds + real orders taken here (admin store)
+  const slots = useMemo(() => {
+    if (!date) return [];
+    return slotsWithAvailability(date, minutes).map((s) => {
+      if (!admin) return s;
+      const all = busyLanes(date, s.min, minutes);
+      adminBlocked(admin, date, s.min, minutes).forEach((n) => all.add(n));
+      return { ...s, free: TOTAL_LANES - all.size };
+    });
+  }, [date, minutes, admin]);
+  const busy = useMemo(() => {
+    if (!date || start === null) return new Set<number>();
+    const all = busyLanes(date, start, minutes);
+    if (admin) adminBlocked(admin, date, start, minutes).forEach((n) => all.add(n));
+    return all;
+  }, [date, start, minutes, admin]);
   const suggestion = useMemo(() => suggestLanes(busy, lanesNeeded), [busy, lanesNeeded]);
   const lanes = picked ?? suggestion;
   const shoeCount = shoes ?? guests;
-  const quote = date && start !== null ? laneQuote(date, start, hours, lanes.length, shoeCount, arcade) : null;
+  const quote = useMemo(() => {
+    if (!date || start === null) return null;
+    const base = laneQuote(date, start, hours, lanes.length, shoeCount, arcade);
+    const tier = admin ? tierFor(admin, date, start) : null;
+    const bowling = admin ? lanes.reduce((sum, n) => sum + lanePrice(admin, date, start, n) * hours, 0) : base.bowling;
+    const shoeCost = admin ? admin.shoes * shoeCount : base.shoeCost;
+    const promo = admin && promoCode ? checkDiscount(admin, promoCode, bowling, bowling + shoeCost + arcade) : null;
+    const discount = promo && promo.ok ? promo.amount : 0;
+    const subtotal = bowling + shoeCost + arcade - discount;
+    const tax = Math.round(subtotal * (admin?.taxRate ?? 0.065) * 100) / 100;
+    const total = Math.round((subtotal + tax) * 100) / 100;
+    const card = admin && giftCode ? findGiftCard(admin, giftCode) : null;
+    const gift = card && card.active && pay === "now" ? Math.min(card.balance, total) : 0;
+    return {
+      rate: { hour: tier?.hour ?? base.rate.hour, tier: tier?.label ?? base.rate.tier },
+      bowling, shoeCost, arcade, promo, discount, tax, total, card, gift, due: Math.round((total - gift) * 100) / 100,
+    };
+  }, [date, start, hours, lanes, shoeCount, arcade, admin, promoCode, giftCode, pay]);
   const ready = !!(date && start !== null && lanes.length > 0);
   const contactOk = contact.name.trim().length > 1 && /\S+@\S+\.\S+/.test(contact.email) && contact.phone.replace(/\D/g, "").length >= 10;
   const whenLabel =
@@ -97,6 +136,18 @@ export function LaneRental() {
     if (!ready || !quote) return;
     const b: SavedBooking = { code: bookingCode(), date, start: start!, hours, lanes, guests, total: quote.total, name: contact.name };
     saveBooking(b);
+    // hand the order to the owner's panel (/admin): it shows up as confirmed (paid) or pending (pay at desk)
+    updateAdmin((d) => {
+      d.orders.unshift({
+        code: b.code, status: pay === "now" ? "confirmed" : "pending", date: b.date, start: b.start, hours, lanes, guests, shoes: shoeCount,
+        name: contact.name, phone: contact.phone, email: contact.email, total: quote.total, paid: pay === "now" ? quote.total : 0, refunded: 0,
+        payAt: pay === "now" ? "online" : "desk", source: "online", createdAt: new Date().toISOString(),
+        notes: [bumpers ? "Bumpers up" : "", arcade ? `Arcade card $${arcade}` : "", quote.discount ? `Code ${quote.promo && quote.promo.ok ? quote.promo.code : ""} -${money(quote.discount)}` : "", quote.gift ? `Gift card ${quote.card?.code} -${money(quote.gift)}` : "", names.filter(Boolean).length ? `Bowlers: ${names.filter(Boolean).join(", ")}` : ""].filter(Boolean).join(" · "),
+      });
+      if (quote.promo && quote.promo.ok) d.discounts = d.discounts.map((x) => (x.code === (quote.promo as { code: string }).code ? { ...x, uses: x.uses + 1 } : x));
+      if (quote.gift && quote.card) d.giftCards = d.giftCards.map((g) => (g.code === quote.card!.code ? { ...g, balance: Math.round((g.balance - quote.gift) * 100) / 100 } : g));
+      return d;
+    }, `Online booking ${b.code}: lane${lanes.length > 1 ? "s" : ""} ${lanes.join(", ")}, ${money(quote.total)}`);
     setDone(b);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -159,6 +210,16 @@ export function LaneRental() {
     );
   }
 
+  if (admin && !admin.onlineBooking) {
+    return (
+      <div className="glass-panel glass-panel-static rounded-3xl p-8 text-center">
+        <p className="font-[family-name:var(--font-display)] text-3xl text-white">Online lane booking is paused</p>
+        <p className="mt-2 text-slate-400">Lanes are walk-in only right now. Call {BUSINESS.phone} and the front desk will help.</p>
+        {payMsg}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 pb-28">
       {myBookings.length > 0 && (
@@ -204,7 +265,7 @@ export function LaneRental() {
               <button type="button" aria-label="Fewer bowlers" onClick={() => { setGuests((g) => Math.max(1, g - 1)); setLaneCount(null); setPicked(null); }} className="h-11 w-11 rounded-full border border-white/15 text-xl text-white">−</button>
               <output className="w-12 text-center font-[family-name:var(--font-display)] text-4xl text-white">{guests}</output>
               <button type="button" aria-label="More bowlers" onClick={() => { setGuests((g) => Math.min(60, g + 1)); setLaneCount(null); setPicked(null); }} className="h-11 w-11 rounded-full border border-white/15 text-xl text-white">+</button>
-              <span className="text-xs text-slate-500">up to {MAX_PER_LANE} per lane</span>
+              <span className="text-xs text-slate-500">up to {perLane} per lane</span>
             </div>
           </div>
           <div>
@@ -237,7 +298,7 @@ export function LaneRental() {
             {slots.map((s) => {
               const full = s.free < lanesNeeded;
               const on = start === s.min;
-              const rate = laneQuote(date, s.min, 1, 1, 0, 0).rate.hour;
+              const rate = admin ? tierFor(admin, date, s.min).hour : laneQuote(date, s.min, 1, 1, 0, 0).rate.hour;
               return (
                 <button
                   key={s.min}
@@ -350,6 +411,28 @@ export function LaneRental() {
               <input type="checkbox" className="h-4 w-4 accent-cyan-400" checked={contact.texts} onChange={(e) => setContact({ ...contact, texts: e.target.checked })} />
               Text me the confirmation and a reminder
             </label>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <div>
+                <span className="text-sm text-slate-300">Promo code</span>
+                <div className="mt-1 flex gap-2">
+                  <input className={`${inputCls} mt-0 uppercase`} value={promoInput} onChange={(e) => setPromoInput(e.target.value)} placeholder="e.g. KNIGHTS" />
+                  <button type="button" onClick={() => setPromoCode(promoInput)} className="rounded-lg border border-cyan-400/50 px-3 text-sm font-semibold text-cyan-200">Apply</button>
+                </div>
+                {quote?.promo && <p className={`mt-1 text-xs ${quote.promo.ok ? "text-emerald-300" : "text-amber-300"}`}>{quote.promo.ok ? `${quote.promo.code}: ${quote.promo.label}` : quote.promo.reason}</p>}
+              </div>
+              <div>
+                <span className="text-sm text-slate-300">Gift card</span>
+                <div className="mt-1 flex gap-2">
+                  <input className={`${inputCls} mt-0 uppercase`} value={giftInput} onChange={(e) => setGiftInput(e.target.value)} placeholder="GC-XXXX-XXXX" />
+                  <button type="button" onClick={() => { setGiftCode(giftInput); setPayMsg(""); }} className="rounded-lg border border-cyan-400/50 px-3 text-sm font-semibold text-cyan-200">Apply</button>
+                </div>
+                {giftCode && (
+                  <p className={`mt-1 text-xs ${quote?.card?.active && quote.card.balance > 0 ? "text-emerald-300" : "text-amber-300"}`}>
+                    {!quote?.card ? "We couldn't find that gift card." : !quote.card.active ? "That gift card is turned off." : quote.card.balance <= 0 ? "That gift card has no balance left." : pay === "desk" ? `Balance ${money(quote.card.balance)}: choose Pay now to use it.` : `Using ${money(quote.gift)} of ${money(quote.card.balance)}`}
+                  </p>
+                )}
+              </div>
+            </div>
             <div className="mt-1 grid grid-cols-2 gap-2" role="radiogroup" aria-label="Payment">
               {(["now", "desk"] as const).map((p) => (
                 <button key={p} type="button" role="radio" aria-checked={pay === p} onClick={() => setPay(p)} className={`rounded-xl border px-3 py-3 text-left text-sm ${pay === p ? "border-cyan-300 bg-cyan-500/15 text-white" : "border-white/10 text-slate-300"}`}>
@@ -366,9 +449,11 @@ export function LaneRental() {
                 <dt>Lane{lanes.length > 1 ? "s" : ""} {lanes.join(", ")} · {lanes.length} × {hours} hr × {money(quote.rate.hour)}</dt><dd className="text-right">{money(quote.bowling)}</dd>
                 <dt>Shoes × {shoeCount}</dt><dd className="text-right">{money(quote.shoeCost)}</dd>
                 {arcade > 0 && (<><dt>Arcade card</dt><dd className="text-right">{money(arcade)}</dd></>)}
-                <dt>Tax (6.5%)</dt><dd className="text-right">{money(quote.tax)}</dd>
+                {quote.discount > 0 && (<><dt className="text-emerald-300">Promo {quote.promo && quote.promo.ok ? quote.promo.code : ""}</dt><dd className="text-right text-emerald-300">−{money(quote.discount)}</dd></>)}
+                <dt>Tax ({((admin?.taxRate ?? 0.065) * 100).toFixed(1)}%)</dt><dd className="text-right">{money(quote.tax)}</dd>
                 <dt className="border-t border-white/10 pt-2 font-bold text-white">Total</dt><dd className="border-t border-white/10 pt-2 text-right text-xl font-bold text-cyan-200">{money(quote.total)}</dd>
-                <dt className="col-span-2 pt-1 text-xs text-slate-500">{quote.rate.tier} rate. Lanes are held for 15 minutes past your start time.</dt>
+                {quote.gift > 0 && (<><dt className="text-emerald-300">Gift card {quote.card?.code}</dt><dd className="text-right text-emerald-300">−{money(quote.gift)}</dd><dt className="font-bold text-white">Due now</dt><dd className="text-right font-bold text-white">{money(quote.due)}</dd></>)}
+                <dt className="col-span-2 pt-1 text-xs text-slate-500">{quote.rate.tier} rate. Lanes are held for {admin?.holdMinutes ?? 15} minutes past your start time.</dt>
               </dl>
             ) : (
               <p className="text-sm text-slate-500">Your total shows here.</p>
@@ -379,7 +464,7 @@ export function LaneRental() {
               onClick={reserve}
               className="mt-5 w-full rounded-full bg-gradient-to-r from-orange-500 to-rose-500 py-3.5 text-sm font-bold uppercase tracking-wide text-white shadow-xl shadow-orange-500/30 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              {pay === "now" ? `Pay ${quote ? money(quote.total) : ""} & reserve` : "Reserve lanes"}
+              {pay === "now" ? `Pay ${quote ? money(quote.due) : ""} & reserve` : "Reserve lanes"}
             </button>
             <p className="mt-2 text-center text-[11px] text-slate-500">Concept demo: no card is charged and no lane is held.</p>
           </div>

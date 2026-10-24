@@ -28,4 +28,5 @@ export const PATH = {
   promotions: "/promotions",
   book: "/book",
   rentLane: "/rent-a-lane",
+  giftCards: "/gift-cards",
 } as const;

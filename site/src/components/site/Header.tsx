@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { BUSINESS } from "@/lib/site-data";
 import { PATH } from "@/lib/paths";
 import { NAV_GROUPS } from "@/components/site/nav-config";
@@ -54,7 +55,7 @@ export function Header() {
   }, [mobileOpen]);
 
   return (
-    <header className="sticky top-[44px] z-50 border-b border-white/10 bg-slate-950/75 backdrop-blur-xl sm:top-[46px]">
+    <header className="relative border-b border-white/10 bg-slate-950/75 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3">
         <Link
           href={PATH.home}
@@ -169,15 +170,15 @@ export function Header() {
         </button>
       </div>
 
-      {mobileOpen && (
-        <div className="fixed inset-0 z-[80] lg:hidden">
+      {mobileOpen && createPortal(
+        <div className="fixed inset-0 z-[200] lg:hidden" role="dialog" aria-modal="true" aria-label="Site menu">
           <button
             type="button"
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             aria-label="Close menu"
             onClick={() => setMobileOpen(false)}
           />
-          <div className="absolute right-0 top-0 flex h-full w-[min(100%,400px)] flex-col border-l border-white/10 bg-slate-950 shadow-2xl">
+          <div className="absolute right-0 top-0 flex h-[100dvh] w-[min(100%,400px)] flex-col border-l border-white/10 bg-slate-950 shadow-2xl">
             <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
               <span className="font-[family-name:var(--font-display)] text-lg tracking-widest text-white">Menu</span>
               <button
@@ -247,7 +248,8 @@ export function Header() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </header>
   );

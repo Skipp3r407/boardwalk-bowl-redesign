@@ -115,6 +115,11 @@ export function Footer() {
           © {new Date().getFullYear()} {BUSINESS.name}. Demo redesign for proposal presentation. Business information
           sourced from the public Boardwalk Bowl website.
         </p>
+        <p className="mt-2 text-center text-xs">
+          <Link href="/admin" className="text-slate-600 underline decoration-white/10 underline-offset-2 hover:text-cyan-300">
+            Staff login
+          </Link>
+        </p>
         <p className="mt-3 text-center text-xs text-slate-500">
           Website Designed &amp; Powered by{" "}
           <a
