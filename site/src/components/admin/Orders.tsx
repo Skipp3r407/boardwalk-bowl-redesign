@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { TOTAL_LANES } from "@/lib/lanes";
-import { adminBlocked, addDays, lanePrice, money, timeLabel, todayIso, updateAdmin, type AdminData, type Order, type OrderStatus } from "@/lib/admin-store";
+import { adminBlocked, addDays, lanePrice, money, randomDigits, timeLabel, todayIso, updateAdmin, type AdminData, type Order, type OrderStatus } from "@/lib/admin-store";
 import { Badge, Btn, Drawer, Empty, Field, Panel, StatusBadge, downloadCsv, inputCls } from "./ui";
 
 const STATUSES: (OrderStatus | "all")[] = ["all", "pending", "confirmed", "checked-in", "completed", "cancelled", "refunded"];
@@ -69,7 +69,7 @@ function OrderDrawer({ d, order, onClose }: { d: AdminData; order: Order; onClos
             {order.status === "pending" && <Btn tone="success" onClick={() => set({ status: "confirmed" }, "confirmed")}>Confirm</Btn>}
             {(order.status === "pending" || order.status === "confirmed") && <Btn tone="success" onClick={() => set({ status: "checked-in" }, "checked in")}>Check in</Btn>}
             {order.status === "checked-in" && <Btn onClick={() => set({ status: "completed" }, "completed")}>Mark completed</Btn>}
-            {order.paid < order.total && <Btn onClick={() => set({ paid: order.total }, `payment of ${money(order.total - order.paid)} taken at the desk`)}>Mark paid</Btn>}
+            {order.paid < order.total && <Btn onClick={() => { const due = Math.round((order.total - order.paid) * 100) / 100; updateAdmin((x) => ({ ...x, payments: [{ id: randomDigits("PAY-", 5), at: new Date().toISOString(), customerId: x.customers.find((c) => c.name === order.name)?.id ?? null, customerName: order.name, orderCode: order.code, items: [{ label: `Booking ${order.code}`, qty: 1, price: due, kind: "lane" }], subtotal: due, discount: 0, tax: 0, tip: 0, total: due, method: "card", cash: 0, card: due, gift: 0, giftCode: "", change: 0, refunded: 0, status: "paid", staff: "Front desk" }, ...x.payments] })); set({ paid: order.total }, `payment of ${money(due)} taken at the desk (card)`); }}>Mark paid (card)</Btn>}
             <Btn onClick={() => setMsg(`Confirmation re-sent to ${order.email}${order.phone ? " and by text" : ""} (demo)`)}>Resend confirmation</Btn>
           </div>
         )}

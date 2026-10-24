@@ -18,6 +18,9 @@ export function Dashboard({ d, go }: { d: AdminData; go: (tab: string) => void }
   const outstanding = d.giftCards.filter((g) => g.active).reduce((s, g) => s + g.balance, 0);
   const states = laneStates(d, t, nowMin);
   const inUse = states.filter((s) => s.kind === "order" || s.kind === "walkin").length;
+  const powered = Object.keys(d.lanePower).length;
+  const todayPay = d.payments.filter((p) => new Date(p.at).toLocaleDateString("en-CA") === t);
+  const followUps = d.customers.filter((c) => c.followUp && !c.followUp.done && c.followUp.date <= t);
   const pending = d.orders.filter((o) => o.status === "pending");
   const newParties = d.parties.filter((p) => p.status === "new");
   const closed = Object.entries(d.closedLanes);
@@ -31,19 +34,20 @@ export function Dashboard({ d, go }: { d: AdminData; go: (tab: string) => void }
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat label="Today's bookings" value={String(today.length)} sub={`${today.reduce((s, o) => s + o.guests, 0)} bowlers`} />
         <Stat label="Today's revenue" value={money(net(t, t))} sub="lanes, paid minus refunds" tone="emerald" />
-        <Stat label="Lanes in use now" value={`${inUse}/80`} sub={timeLabel(nowMin)} tone="orange" />
+        <Stat label="Lanes on now" value={`${powered}/80`} sub={`${inUse} busy incl. demo open play · ${timeLabel(nowMin)}`} tone="orange" />
         <Stat label="Pending" value={String(pending.length)} sub="need confirming or payment" tone="amber" />
         <Stat label="Gift cards (30 days)" value={money(giftSales)} sub={`${money(outstanding)} unspent balance`} tone="fuchsia" />
         <Stat label="Arcade cards (30 days)" value={money(arcadeSales)} sub={`${d.arcadeSales.length} sales`} tone="cyan" />
         <Stat label="Party requests" value={String(newParties.length)} sub="new, waiting on you" tone="amber" />
-        <Stat label="Lanes closed" value={String(closed.length)} sub={closed.map(([n]) => `#${n}`).join(", ") || "all lanes open"} tone="orange" />
+        <Stat label="Register today" value={money(todayPay.reduce((s, p) => s + p.total - p.refunded, 0))} sub={`${todayPay.length} payments · cash ${money(todayPay.reduce((s, p) => s + p.cash, 0))}`} tone="emerald" />
       </div>
 
-      {(pending.length > 0 || newParties.length > 0 || closed.length > 0 || !d.onlineBooking) && (
+      {(pending.length > 0 || newParties.length > 0 || closed.length > 0 || followUps.length > 0 || !d.onlineBooking) && (
         <Panel title="Needs attention">
           <ul className="space-y-2 text-sm">
             {!d.onlineBooking && <li className="flex items-center justify-between gap-3 rounded-lg border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-rose-100">Online lane booking is paused <Btn small onClick={() => go("settings")}>Settings</Btn></li>}
             {pending.length > 0 && <li className="flex items-center justify-between gap-3 rounded-lg border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-amber-100">{pending.length} pending order{pending.length > 1 ? "s" : ""} (pay at desk or not confirmed) <Btn small onClick={() => go("orders:pending")}>Review</Btn></li>}
+            {followUps.length > 0 && <li className="flex items-center justify-between gap-3 rounded-lg border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-amber-100">{followUps.length} customer follow-up{followUps.length > 1 ? "s" : ""} due ({followUps.map((c) => c.name.split(" ")[0]).join(", ")}) <Btn small onClick={() => go("crm")}>CRM</Btn></li>}
             {newParties.length > 0 && <li className="flex items-center justify-between gap-3 rounded-lg border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-amber-100">{newParties.length} new party request{newParties.length > 1 ? "s" : ""} <Btn small onClick={() => go("parties")}>Open</Btn></li>}
             {closed.map(([n, c]) => <li key={n} className="flex items-center justify-between gap-3 rounded-lg border border-white/10 px-3 py-2 text-slate-300">Lane {n} closed: {c.reason} <Btn small onClick={() => go("lanes")}>Lane board</Btn></li>)}
           </ul>

@@ -56,6 +56,49 @@ export type Discount = { code: string; kind: "percent" | "amount"; value: number
 export type ArcadePack = { id: string; price: number; credits: number; bonus: number; label: string; active: boolean };
 export type ArcadeSale = { id: string; card: string; packId: string; price: number; credits: number; buyer: string; email: string; reload: boolean; createdAt: string; sample?: boolean };
 
+export type CrmNote = { at: string; text: string };
+export type Customer = {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  tags: string[];
+  notes: CrmNote[];
+  points: number;
+  marketing: boolean;
+  birthday: string;
+  followUp: { date: string; text: string; done: boolean } | null;
+  createdAt: string;
+  sample?: boolean;
+};
+export type PayMethod = "card" | "cash" | "gift" | "split" | "online";
+export type LineItem = { label: string; qty: number; price: number; kind: "lane" | "shoes" | "food" | "arcade" | "gift" | "other" };
+export type Payment = {
+  id: string;
+  at: string;
+  customerId: string | null;
+  customerName: string;
+  orderCode: string | null;
+  items: LineItem[];
+  subtotal: number;
+  discount: number;
+  tax: number;
+  tip: number;
+  total: number;
+  method: PayMethod;
+  cash: number;
+  card: number;
+  gift: number;
+  giftCode: string;
+  change: number;
+  refunded: number;
+  status: "paid" | "refunded" | "partly-refunded";
+  staff: string;
+  sample?: boolean;
+};
+export type LaneSession = { on: boolean; since: string; until: string; label: string; orderCode: string };
+export type RegisterItem = { id: string; label: string; price: number; kind: LineItem["kind"]; taxable: boolean };
+
 export type AdminData = {
   version: 1;
   tiers: Tier[];
@@ -80,6 +123,11 @@ export type AdminData = {
   discounts: Discount[];
   arcadePacks: ArcadePack[];
   arcadeSales: ArcadeSale[];
+  customers: Customer[];
+  payments: Payment[];
+  lanePower: Record<string, LaneSession>;
+  registerItems: RegisterItem[];
+  loyaltyRate: number;
   log: LogEntry[];
 };
 
@@ -93,7 +141,7 @@ export const addDays = (date: string, n: number) => {
 };
 
 /** Sample orders and party requests around today so the panel isn't empty (clearly marked "Sample"). */
-function seed(): Pick<AdminData, "orders" | "parties" | "giftCards" | "arcadeSales"> {
+function seed(): Pick<AdminData, "orders" | "parties" | "giftCards" | "arcadeSales" | "customers" | "payments" | "lanePower"> {
   const t = todayIso();
   const people = [
     ["Maria Gonzalez", "407-555-0141"], ["Jason Lee", "321-555-0177"], ["Tasha Brown", "407-555-0102"],
@@ -140,7 +188,28 @@ function seed(): Pick<AdminData, "orders" | "parties" | "giftCards" | "arcadeSal
     { id: "A-2202", card: "AC-099310", packId: "p10", price: 10, credits: 40, buyer: "Tasha Brown", email: "tasha@example.com", reload: true, createdAt: new Date(Date.now() - 26 * 3600e3).toISOString(), sample: true },
     { id: "A-2203", card: "AC-104951", packId: "p50", price: 50, credits: 260, buyer: "Carlos Rivera", email: "carlos@example.com", reload: false, createdAt: new Date(Date.now() - 50 * 3600e3).toISOString(), sample: true },
   ];
-  return { orders, parties, giftCards, arcadeSales };
+  const tagsFor = (i: number) => [["Regular"], ["League bowler", "Regular"], ["Birthday parent"], ["UCF student"], [], ["Corporate"], ["Regular"], ["Birthday parent"], [], ["League bowler"]][i];
+  const customers: Customer[] = people.map(([name, phone], i) => ({
+    id: `C-${1001 + i}`, name, phone, email: `${name.split(" ")[0].toLowerCase()}@example.com`, tags: tagsFor(i),
+    notes: i === 1 ? [{ at: new Date(Date.now() - 4 * 864e5).toISOString(), text: "Asks for lanes 21-22, likes the end of the house" }] : i === 5 ? [{ at: new Date(Date.now() - 9 * 864e5).toISOString(), text: "Interested in a quarterly team-building package" }] : [],
+    points: [120, 860, 45, 210, 0, 330, 540, 75, 15, 990][i], marketing: i % 3 !== 2,
+    birthday: i === 2 ? "1990-11-02" : i === 6 ? "1985-10-30" : "", followUp: i === 5 ? { date: addDays(t, 2), text: "Send corporate package pricing", done: false } : i === 7 ? { date: addDays(t, -1), text: "Call back about Saturday party date", done: false } : null,
+    createdAt: new Date(Date.now() - (60 - i * 5) * 864e5).toISOString(), sample: true,
+  }));
+  const payments: Payment[] = orders.filter((o) => o.paid > 0).map((o, i) => {
+    const subtotal = Math.round((o.total / 1.065) * 100) / 100;
+    const method: PayMethod = o.payAt === "online" ? "online" : i % 2 ? "cash" : "card";
+    return {
+      id: `PAY-${5001 + i}`, at: o.createdAt, customerId: customers.find((c) => c.name === o.name)?.id ?? null, customerName: o.name, orderCode: o.code,
+      items: [{ label: `Lane${o.lanes.length > 1 ? "s" : ""} ${o.lanes.join(", ")} · ${o.hours} hr`, qty: 1, price: subtotal - o.shoes * 5, kind: "lane" }, { label: "Shoe rental", qty: o.shoes, price: 5, kind: "shoes" }],
+      subtotal, discount: 0, tax: Math.round((o.total - subtotal) * 100) / 100, tip: 0, total: o.total, method,
+      cash: method === "cash" ? o.total : 0, card: method === "card" || method === "online" ? o.total : 0, gift: 0, giftCode: "", change: 0,
+      refunded: o.refunded, status: o.refunded >= o.total ? "refunded" : o.refunded > 0 ? "partly-refunded" : "paid", staff: method === "online" ? "Website" : "Front desk", sample: true,
+    };
+  });
+  const lanePower: Record<string, LaneSession> = {};
+  for (const o of orders) if (o.status === "checked-in" && o.date === t) for (const n of o.lanes) lanePower[String(n)] = { on: true, since: new Date(Date.now() - 40 * 60e3).toISOString(), until: new Date(Date.now() + 50 * 60e3).toISOString(), label: o.name, orderCode: o.code };
+  return { orders, parties, giftCards, arcadeSales, customers, payments, lanePower };
 }
 
 export function defaults(): AdminData {
@@ -181,6 +250,20 @@ export function defaults(): AdminData {
       { id: "p50", price: 50, credits: 200, bonus: 60, label: "Pro", active: true },
       { id: "p100", price: 100, credits: 400, bonus: 150, label: "Legend", active: true },
     ],
+    registerItems: [
+      { id: "shoes", label: "Shoe rental", price: 5, kind: "shoes", taxable: true },
+      { id: "socks", label: "Bowling socks", price: 3, kind: "other", taxable: true },
+      { id: "pizza", label: "Large pizza", price: 18.99, kind: "food", taxable: true },
+      { id: "wings", label: "Wings (10)", price: 14.99, kind: "food", taxable: true },
+      { id: "nachos", label: "Loaded nachos", price: 11.99, kind: "food", taxable: true },
+      { id: "soda-pitcher", label: "Soda pitcher", price: 8.99, kind: "food", taxable: true },
+      { id: "beer-pitcher", label: "Domestic pitcher", price: 16, kind: "food", taxable: true },
+      { id: "arcade10", label: "Arcade card $10", price: 10, kind: "arcade", taxable: false },
+      { id: "arcade25", label: "Arcade card $25", price: 25, kind: "arcade", taxable: false },
+      { id: "gift25", label: "Gift card $25", price: 25, kind: "gift", taxable: false },
+      { id: "gift50", label: "Gift card $50", price: 50, kind: "gift", taxable: false },
+    ],
+    loyaltyRate: 1,
     ...seed(),
     log: [{ at: new Date().toISOString(), who: "System", text: "Admin demo started with sample orders" }],
   };
@@ -279,6 +362,19 @@ export function randomCode(prefix: string, groups = 2) {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   const g = () => Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
   return [prefix, ...Array.from({ length: groups }, g)].join("-");
+}
+
+/** Find or create a CRM customer by email/phone/name. Returns the updated list and the customer's id. */
+export function upsertCustomer(list: Customer[], c: { name: string; phone?: string; email?: string; tags?: string[] }): [Customer[], string] {
+  const norm = (v?: string) => (v ?? "").trim().toLowerCase();
+  const digits = (v?: string) => (v ?? "").replace(/\D/g, "");
+  const hit = list.find((x) => (c.email && norm(x.email) === norm(c.email)) || (digits(c.phone).length >= 10 && digits(x.phone) === digits(c.phone)) || (!c.email && !c.phone && norm(x.name) === norm(c.name)));
+  if (hit) {
+    const merged = { ...hit, phone: hit.phone || c.phone || "", email: hit.email || c.email || "", tags: [...new Set([...hit.tags, ...(c.tags ?? [])])] };
+    return [list.map((x) => (x.id === hit.id ? merged : x)), hit.id];
+  }
+  const id = `C-${Math.floor(2000 + Math.random() * 7999)}`;
+  return [[{ id, name: c.name, phone: c.phone ?? "", email: c.email ?? "", tags: c.tags ?? [], notes: [], points: 0, marketing: true, birthday: "", followUp: null, createdAt: new Date().toISOString() }, ...list], id];
 }
 
 export const daysAgoIso = (n: number) => new Date(Date.now() - n * 864e5).toISOString();

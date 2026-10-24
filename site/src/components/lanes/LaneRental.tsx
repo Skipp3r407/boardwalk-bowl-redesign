@@ -18,7 +18,7 @@ import {
 } from "@/lib/lanes";
 import { BUSINESS } from "@/lib/site-data";
 import { PATH } from "@/lib/paths";
-import { adminBlocked, checkDiscount, findGiftCard, lanePrice, tierFor, updateAdmin, useAdmin } from "@/lib/admin-store";
+import { adminBlocked, checkDiscount, findGiftCard, lanePrice, randomDigits, tierFor, updateAdmin, upsertCustomer, useAdmin } from "@/lib/admin-store";
 
 const subscribe = () => () => {};
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -144,6 +144,17 @@ export function LaneRental() {
         payAt: pay === "now" ? "online" : "desk", source: "online", createdAt: new Date().toISOString(),
         notes: [bumpers ? "Bumpers up" : "", arcade ? `Arcade card $${arcade}` : "", quote.discount ? `Code ${quote.promo && quote.promo.ok ? quote.promo.code : ""} -${money(quote.discount)}` : "", quote.gift ? `Gift card ${quote.card?.code} -${money(quote.gift)}` : "", names.filter(Boolean).length ? `Bowlers: ${names.filter(Boolean).join(", ")}` : ""].filter(Boolean).join(" · "),
       });
+      const [customers, cid] = upsertCustomer(d.customers, { name: contact.name, phone: contact.phone, email: contact.email });
+      d.customers = customers;
+      if (pay === "now") {
+        d.payments.unshift({
+          id: randomDigits("PAY-", 5), at: new Date().toISOString(), customerId: cid, customerName: contact.name, orderCode: b.code,
+          items: [{ label: `Lane${lanes.length > 1 ? "s" : ""} ${lanes.join(", ")} · ${hours} hr`, qty: 1, price: quote.bowling, kind: "lane" }, { label: "Shoe rental", qty: shoeCount, price: quote.shoeCost / Math.max(1, shoeCount), kind: "shoes" }, ...(arcade ? [{ label: "Arcade card", qty: 1, price: arcade, kind: "arcade" as const }] : [])],
+          subtotal: quote.bowling + quote.shoeCost + arcade, discount: quote.discount, tax: quote.tax, tip: 0, total: quote.total, method: "online",
+          cash: 0, card: quote.due, gift: quote.gift, giftCode: quote.card?.code ?? "", change: 0, refunded: 0, status: "paid", staff: "Website",
+        });
+        d.customers = d.customers.map((c) => (c.id === cid ? { ...c, points: c.points + Math.floor(quote.total * d.loyaltyRate) } : c));
+      }
       if (quote.promo && quote.promo.ok) d.discounts = d.discounts.map((x) => (x.code === (quote.promo as { code: string }).code ? { ...x, uses: x.uses + 1 } : x));
       if (quote.gift && quote.card) d.giftCards = d.giftCards.map((g) => (g.code === quote.card!.code ? { ...g, balance: Math.round((g.balance - quote.gift) * 100) / 100 } : g));
       return d;

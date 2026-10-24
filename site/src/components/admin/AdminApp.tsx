@@ -8,10 +8,15 @@ import { LaneBoard } from "./LaneBoard";
 import { Orders } from "./Orders";
 import { Pricing, Schedule } from "./Pricing";
 import { Arcade, Discounts, GiftCards } from "./Sales";
-import { Activity, Customers, Parties, Settings } from "./People";
+import { Activity, Parties, Settings } from "./People";
+import { Crm } from "./Crm";
+import { Register } from "./Register";
+import { LaneControl } from "./LaneControl";
 
 const TABS = [
   ["dashboard", "Dashboard", "📊"],
+  ["register", "Register", "💳"],
+  ["control", "Lane control", "⚡"],
   ["lanes", "Lane board", "🎳"],
   ["orders", "Orders", "🧾"],
   ["pricing", "Pricing", "💲"],
@@ -20,7 +25,7 @@ const TABS = [
   ["gift", "Gift cards", "🎁"],
   ["discounts", "Discounts", "🏷️"],
   ["arcade", "Arcade cards", "🕹️"],
-  ["customers", "Customers", "👥"],
+  ["crm", "CRM", "👥"],
   ["settings", "Settings", "⚙️"],
   ["activity", "Activity log", "📝"],
 ] as const;
@@ -113,7 +118,9 @@ export function AdminApp() {
                 {tab === "gift" && <GiftCards d={d} />}
                 {tab === "discounts" && <Discounts d={d} />}
                 {tab === "arcade" && <Arcade d={d} />}
-                {tab === "customers" && <Customers d={d} />}
+                {tab === "crm" && <Crm d={d} />}
+                {tab === "register" && <Register d={d} />}
+                {tab === "control" && <LaneControl d={d} />}
                 {tab === "settings" && <Settings d={d} />}
                 {tab === "activity" && <Activity d={d} />}
               </>
